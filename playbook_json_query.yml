@@ -1,0 +1,62 @@
+---
+- name: Verify json query
+  hosts: localhost
+  gather_facts: true
+  tasks:
+    - name: "10: Set facts"
+      ansible.builtin.set_fact:
+        data: "{{ lookup('file', 'data.json') }}"
+
+    - name: "20: Set AND fact using the intersection of two queries (known good)"
+      ansible.builtin.set_fact:
+        long_and: "{{ list1 | intersect(list2) | sort }}"
+      vars:
+        query1: "json[?starts_with(architecture, 'x86')].bios_vendor"
+        query2: "json[?bios_version<`200`].bios_vendor"
+        list1: "{{ data | to_json | from_json | json_query(query1) }}"
+        list2: "{{ data | to_json | from_json | json_query(query2) }}"
+
+    - name: "21: Print AND fact"
+      ansible.builtin.debug:
+        msg:
+          - "Task 20 output: {{ long_and }}"
+          - "Note: Task 20 query2 includes a mathematical comparison to a value in the source file \
+            using the ==, < or > operators and also requires the int or float be captured in back ticks \
+            (`200`)!!"
+
+    - name: "30: Set AND fact using && operator in json query"
+      ansible.builtin.set_fact:
+        short_and: "{{ data | to_json | from_json | json_query(query1) | sort }}"
+      vars:
+        query1: "json[?starts_with(architecture, 'x86') && bios_version<`200`].bios_vendor"
+
+    - name: "31: Print AND fact"
+      ansible.builtin.debug:
+        msg:
+          - "Task 30 output: {{ short_and }}"
+          - "Note: Task 30 query1 includes a mathematical comparison to a value in the source file \
+            using the ==, < or > operators and also requires the int or float be captured in back ticks \
+            (`200`)!!"
+
+    - name: "40: Set OR fact using the union of two queries (known good)"
+      ansible.builtin.set_fact:
+        long_or: "{{ list1 | union(list2) | sort }}"
+      vars:
+        query1: "json[?starts_with(architecture, 'x86')].bios_vendor"
+        query2: "json[?contains(architecture, 'arm')].bios_vendor"
+        list1: "{{ data | to_json | from_json | json_query(query1) }}"
+        list2: "{{ data | to_json | from_json | json_query(query2) }}"
+
+    - name: "41: Print OR fact"
+      ansible.builtin.debug:
+        msg: "Task 40 output: {{ long_or }}"
+
+    - name: "50: Set AND fact using || operator in json query"
+      ansible.builtin.set_fact:
+        short_or: "{{ data | to_json | from_json | json_query(query1) | sort }}"
+      vars:
+        query1: "json[?starts_with(architecture, 'x86') || contains(architecture, 'arm')].bios_vendor"
+
+    - name: "51: Print facts AND"
+      ansible.builtin.debug:
+        msg: "Task 50 output: {{ short_or }}"

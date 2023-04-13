@@ -1,0 +1,24 @@
+{"json":
+    [
+        {"architecture": "x86_64",
+        "bios_date": "04/01/2014",
+        "bios_vendor": "SeaBIOS",
+        "bios_version": 100
+        },
+        {"architecture": "arm_64",
+        "bios_date": "07/25/2011",
+        "bios_vendor": "WhatABIOS",
+        "bios_version": 200
+        },
+        {"architecture": "x86",
+        "bios_date": "03/25/1972",
+        "bios_vendor": "AcornBIOS",
+        "bios_version": 100
+        },
+        {"architecture": "mips",
+        "bios_date": "09/01/2021",
+        "bios_vendor": "BoNosBIOS",
+        "bios_version": 400
+        }
+    ]
+}
